@@ -102,8 +102,7 @@ class _homepageState extends State<HomePage> {
                                   );
                                 },
                                 leading: CircleAvatar(
-                                  backgroundImage: NetworkImage(
-                                      targetUser.profilepic.toString()),
+                                  backgroundImage: AssetImage("assets/img_2.jpg")
                                 ),
                                 title: Text(targetUser.fullname.toString()),
                                 subtitle: (chatRoomModel.lastMessage
@@ -148,13 +147,14 @@ class _homepageState extends State<HomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.white,
         onPressed: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
             return SearchPage(
                 userModel: widget.userModel, firebaseUser: widget.firebaseUser);
           }));
         },
-        child: Icon(Icons.search),
+        child: Icon(Icons.search,color: Colors.black,size: 28,),
       ),
     );
   }

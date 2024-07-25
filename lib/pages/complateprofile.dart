@@ -11,12 +11,13 @@ import 'package:image_picker/image_picker.dart';
 
 import '../models/UserModel.dart';
 
-
 class CompleteProfile extends StatefulWidget {
   final UserModel userModel;
   final User firebaseUser;
 
-  const CompleteProfile({Key? key, required this.userModel, required this.firebaseUser}) : super(key: key);
+  const CompleteProfile(
+      {Key? key, required this.userModel, required this.firebaseUser})
+      : super(key: key);
 
   @override
   State<CompleteProfile> createState() => _complateprofileState();
@@ -27,42 +28,13 @@ class _complateprofileState extends State<CompleteProfile> {
 
   XFile? imageFile;
 
-  //   final picker = ImagePicker();
-  //   if (pickGalleryImage == true) {
-  //     image = await picker.pickImage(source: ImageSource.gallery);
-  //   } else {
-  //     image = await picker.pickImage(source: ImageSource.camera);
-  //   }
-  //
-  //   if (image != null) {
-  //     final croppedImage = await cropImages(image);
-  //   }
-  // }
-  //
-  // Future cropImages(XFile image) async {
-  //   final CroppedFile = await ImageCropper().cropImage(sourcePath: image.path,
-  //   aspectRatioPresets: [
-  //     CropAspectRatioPreset.square,
-  //     CropAspectRatioPreset.ratio4x3,
-  //     CropAspectRatioPreset.original,
-  //     CropAspectRatioPreset.ratio7x5,
-  //     CropAspectRatioPreset.ratio16x9
-  //   ],
-  //     AndroidUiSettings(
-  //
-  //     )
-  //   );
-  //
-  //   return CroppedFile;
-  // }
-
   // void selectImage(ImageSource source) async {
   //   XFile? pickedFile = await ImagePicker().pickImage(source: source);
   //
   //   if (pickedFile != null) {
   //     cropImage(pickedFile);
   //   }
-
+  //
   // void cropImage(XFile file) async {
   // File? croppedImage = await ImageCropper.cropImage(sourcePath: file.path);
   //
@@ -80,22 +52,26 @@ class _complateprofileState extends State<CompleteProfile> {
       print("Please fill all fields");
     } else {
       uploadData();
-
     }
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) {
-        return HomePage(userModel: widget.userModel, firebaseUser: widget.firebaseUser);
+        return HomePage(
+            userModel: widget.userModel, firebaseUser: widget.firebaseUser);
       }),
     );
-      // return homepage(: widget.userModel, firebaseuser: widget.firebaseUser);
+    // return homepage(: widget.userModel, firebaseuser: widget.firebaseUser);
   }
-   void uploadData()async{
-     String fullname = fullNameController.text.trim();
-     widget.userModel.fullname = fullname;
 
-     await FirebaseFirestore.instance.collection("users").doc(widget.userModel.uid).set(widget.userModel.toMap());
-   }
+  void uploadData() async {
+    String fullname = fullNameController.text.trim();
+    widget.userModel.fullname = fullname;
+
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(widget.userModel.uid)
+        .set(widget.userModel.toMap());
+  }
 
   void showPhotoOption() {
     showDialog(
@@ -136,26 +112,29 @@ class _complateprofileState extends State<CompleteProfile> {
       ),
       body: SafeArea(
         child: Container(
-          padding: EdgeInsets.symmetric(
-              horizontal: 40
-          ),
+          padding: EdgeInsets.symmetric(horizontal: 40),
           child: ListView(
             children: [
-
-              SizedBox(height: 20,),
-
-
-              SizedBox(height: 20,),
-
+              SizedBox(
+                height: 20,
+              ),
+              CircleAvatar(
+                radius: 60,
+                backgroundColor: Theme.of(context).colorScheme.secondary,
+                child: Icon(Icons.person,color: Colors.white,size: 90,),
+              ),
+              SizedBox(
+                height: 20,
+              ),
               TextField(
                 controller: fullNameController,
                 decoration: InputDecoration(
                   labelText: "Full Name",
                 ),
               ),
-
-              SizedBox(height: 20,),
-
+              SizedBox(
+                height: 20,
+              ),
               CupertinoButton(
                 onPressed: () {
                   checkValue();
@@ -163,7 +142,6 @@ class _complateprofileState extends State<CompleteProfile> {
                 color: Theme.of(context).colorScheme.secondary,
                 child: Text("Submit"),
               ),
-
             ],
           ),
         ),

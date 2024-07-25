@@ -121,7 +121,7 @@ class _searchpageState extends State<SearchPage > {
                               }
                             },
                             leading: CircleAvatar(
-                              backgroundImage: NetworkImage(searchedUser.profilepic!),
+                              backgroundImage: AssetImage("assets/img_2.jpg"),
                               backgroundColor: Colors.grey[500],
                             ),
                             title: Text(searchedUser.fullname!),
