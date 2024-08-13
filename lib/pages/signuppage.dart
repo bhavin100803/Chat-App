@@ -19,29 +19,30 @@ class _singuppageState extends State<SignUpPage > {
   TextEditingController passwordController = TextEditingController();
   TextEditingController cPasswordController = TextEditingController();
 
+
   void checkValues() {
     String email = emailController.text.trim();
     String password = passwordController.text.trim();
     String cPassword = cPasswordController.text.trim();
 
-    if(email == "" || password == "" || cPassword == "") {
+    if(email == "" || password == "" || cPassword == "" ) {
       UIHelper.showAlertDialog(context, "Incomplete Data", "Please fill all the fields");
     }
-    else if(password != cPassword) {
+    else if(password != cPassword ) {
       UIHelper.showAlertDialog(context, "Password Mismatch", "The passwords you entered do not match!");
     }
     else {
-      signUp(email, password);
+      signUp(email, password );
     }
   }
 
-  void signUp(String email, String password) async {
+  void signUp(String email, String password , ) async {
     UserCredential? credential;
 
     UIHelper.showLoadingDialog(context, "Creating new account..");
 
     try {
-      credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
+      credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password , );
     } on FirebaseAuthException catch(ex) {
       Navigator.pop(context);
 
@@ -54,7 +55,7 @@ class _singuppageState extends State<SignUpPage > {
           uid: uid,
           email: email,
           fullname: "",
-          profilepic: ""
+          profilepic: "",
       );
       await FirebaseFirestore.instance.collection("users").doc(uid).set(newUser.toMap()).then((value) {
         print("New User Created!");

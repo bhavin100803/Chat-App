@@ -2,12 +2,14 @@ import 'package:chatapp/models/UserModel.dart';
 import 'package:chatapp/models/firebasehelper.dart';
 import 'package:chatapp/pages/homepage.dart';
 import 'package:chatapp/pages/loginpage.dart';
+import 'package:chatapp/provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-import 'package:chatapp/models/UserModel.dart';
+
 
 var uuid = Uuid();
 
@@ -50,15 +52,23 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return ChangeNotifierProvider(
+      create: (BuildContext Context)=>UiProvider()..init(),
+      child: Consumer<UiProvider>(
+          builder: (context,UiProvider notifire,child) {
+            return MaterialApp(
+              themeMode: notifire.isDark? ThemeMode.dark : ThemeMode.light,
+              darkTheme: notifire.isDark? notifire.darkTheme : notifire.lightTheme,
+              home: LoginPage(),
+              debugShowCheckedModeBanner: false,
+            );
+          }
       ),
-      home: LoginPage(),
     );
+        // routes: {"login": (context) => Mylogin(), "home": (context) => MyHome()},
+        //  initialRoute: "login",
+       // home: ()
+    // );
   }
 }
 
@@ -72,9 +82,18 @@ class MyAppLoggedIn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: HomePage(userModel: userModel, firebaseUser: firebaseUser)
+    return ChangeNotifierProvider(
+      create: (BuildContext Context)=>UiProvider()..init(),
+      child: Consumer<UiProvider>(
+          builder: (context,UiProvider notifire,child) {
+            return MaterialApp(
+              themeMode: notifire.isDark? ThemeMode.dark : ThemeMode.light,
+              darkTheme: notifire.isDark? notifire.darkTheme : notifire.lightTheme,
+              home: HomePage(userModel: userModel, firebaseUser: firebaseUser),
+              debugShowCheckedModeBanner: false,
+            );
+          }
+      ),
     );
   }
 }

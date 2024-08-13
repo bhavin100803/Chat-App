@@ -186,6 +186,7 @@
 //   }
 // }
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:chatapp/main.dart';
 import 'package:chatapp/models/ChatRoomModel.dart';
@@ -193,7 +194,10 @@ import 'package:chatapp/models/MessageModel.dart';
 import 'package:chatapp/models/UserModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ChatRoomPage extends StatefulWidget {
   final UserModel targetUser;
@@ -229,6 +233,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
           text: msg,
           seen: false);
 
+
       FirebaseFirestore.instance
           .collection("chatrooms")
           .doc(widget.chatroom.chatroomid)
@@ -246,20 +251,107 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     }
   }
 
+  final ImagePicker _imagePicker = ImagePicker();
+  String? imageUrl;
+  bool isLoading = false;
+
+  Future<void> pickImage() async {
+    try {
+      XFile? res = await _imagePicker.pickImage(source: ImageSource.gallery);
+      if (res != null) {
+        await uploadImageToFirebase(File(res.path));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red,
+          content: Text("failed to pick image : $e")));
+    }
+  }
+
+  Future<void> uploadImageToFirebase(File image) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      Reference reference = FirebaseStorage.instance
+          .ref()
+          .child("images/${DateTime
+          .now()
+          .microsecondsSinceEpoch}.png");
+      await reference.putFile(image).whenComplete(() {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+            content: Text("Upload successfully"),
+          ),
+        );
+      });
+      imageUrl = await reference.getDownloadURL();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text("failed upload image : $e"),
+        ),
+      );
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+
+
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickAndShareImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    print(image.toString());
+    if (image != null) {
+      // Share the image
+      Share.shareXFiles([image], text: 'Check out this image!');
+    }
+  }
+
+  Future<void> _pickAndShareVideo() async {
+    final XFile? video = await _picker.pickVideo(source: ImageSource.gallery);
+    if (video != null) {
+      // Share the video
+      Share.shareXFiles([video], text: 'Check out this video!');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
+        title: Column(
           children: [
-            CircleAvatar(
-              backgroundColor: Colors.grey[300],
-              backgroundImage:AssetImage("assets/img_2.jpg")
+            Row(
+              children: [
+                CircleAvatar(
+                    backgroundColor: Colors.grey[300],
+                    backgroundImage: AssetImage("assets/img_2.jpg")),
+                SizedBox(
+                  width: 10,
+                ),
+                Text(widget.targetUser.fullname.toString()),
+                SizedBox(
+                  width: 130,
+                ),
+                // TextButton(
+                //   onPressed: (){
+                //     Navigator.push(
+                //         context,
+                //         MaterialPageRoute(
+                //             builder: (context) =>
+                //     CallPage(callID: widget.targetUser.uid.toString())));
+                //                 CallPage(callID: 1.toString(), userID: widget.targetUser.uid.toString(), username: widget.targetUser.fullname.toString())));
+                //   }, child: Icon(Icons.videocam_rounded,size: 30,),),
+              ],
             ),
-            SizedBox(
-              width: 10,
-            ),
-            Text(widget.targetUser.fullname.toString()),
           ],
         ),
       ),
@@ -282,23 +374,24 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                       if (snapshot.connectionState == ConnectionState.active) {
                         if (snapshot.hasData) {
                           QuerySnapshot dataSnapshot =
-                              snapshot.data as QuerySnapshot;
+                          snapshot.data as QuerySnapshot;
 
                           return ListView.builder(
                             reverse: true,
                             itemCount: dataSnapshot.docs.length,
                             itemBuilder: (context, index) {
                               MessageModel currentMessage =
-                                  MessageModel.fromMap(dataSnapshot.docs[index]
-                                      .data() as Map<String, dynamic>);
+                              MessageModel.fromMap(dataSnapshot.docs[index]
+                                  .data() as Map<String, dynamic>);
 
-                              return Row(
-                                mainAxisAlignment: (currentMessage.sender ==
-                                        widget.userModel.uid)
-                                    ? MainAxisAlignment.end
-                                    : MainAxisAlignment.start,
-                                children: [
-                                  Container(
+                              return Expanded(
+                                child: Column(
+                                  crossAxisAlignment: (currentMessage.sender ==
+                                      widget.userModel.uid)
+                                      ? CrossAxisAlignment.end
+                                      : CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
                                       margin: EdgeInsets.symmetric(
                                         vertical: 2,
                                       ),
@@ -308,20 +401,20 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                       ),
                                       decoration: BoxDecoration(
                                         color: (currentMessage.sender ==
-                                                widget.userModel.uid)
-                                            ? Colors.grey
-                                            : Theme.of(context)
-                                                .colorScheme
-                                                .secondary,
+                                            widget.userModel.uid)
+                                            ? Colors.grey.withOpacity(0.4)
+                                            : Colors.grey.withOpacity(0.6),
                                         borderRadius: BorderRadius.circular(5),
                                       ),
-                                      child: Text(
+                                      child: SelectableText(
                                         currentMessage.text.toString(),
                                         style: TextStyle(
-                                          color: Colors.white,
+                                          // color: Colors.white,
                                         ),
-                                      )),
-                                ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               );
                             },
                           );
@@ -346,7 +439,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               ),
 
               Container(
-                color: Colors.grey[200],
+                // color: Colors.grey[200],
                 padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                 child: Row(
                   children: [
@@ -355,17 +448,29 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                         controller: messageController,
                         maxLines: null,
                         decoration: InputDecoration(
+                            suffixIcon: IconButton(
+                              onPressed: pickImage,
+                              icon: Icon(Icons.photo),),
                             border: InputBorder.none,
                             hintText: "Enter message"),
                       ),
                     ),
+                    // Row(
+                    //   children: [
+                    //     IconButton(onPressed: _pickAndShareImage,
+                    //         icon: Icon(Icons.camera))
+                    //   ],
+                    // ),
+                    GestureDetector(
+                      onTap: showButton,
+                      child: Icon(Icons.attach_file),),
                     IconButton(
                       onPressed: () {
                         sendMessage();
                       },
                       icon: Icon(
                         Icons.send,
-                        color: Theme.of(context).colorScheme.secondary,
+                        // color: Colors.black,
                       ),
                     ),
                   ],
@@ -376,5 +481,38 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         ),
       ),
     );
+  }
+
+
+
+
+  void showButton() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Select and Share"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  onTap: () {
+                    _pickAndShareImage();
+                  },
+
+                  leading: Icon(Icons.photo_album),
+                  title: Text("Select Photo Gallery"),
+                ),
+                ListTile(
+                  onTap: () {
+                     _pickAndShareVideo();
+                  },
+                  leading: Icon(Icons.videocam),
+                  title: Text("Select Video Gallery"),
+                )
+              ],
+            ),
+          );
+        });
   }
 }

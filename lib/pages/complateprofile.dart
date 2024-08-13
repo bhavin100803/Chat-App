@@ -25,30 +25,15 @@ class CompleteProfile extends StatefulWidget {
 
 class _complateprofileState extends State<CompleteProfile> {
   TextEditingController fullNameController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
 
-  XFile? imageFile;
-
-  // void selectImage(ImageSource source) async {
-  //   XFile? pickedFile = await ImagePicker().pickImage(source: source);
-  //
-  //   if (pickedFile != null) {
-  //     cropImage(pickedFile);
-  //   }
-  //
-  // void cropImage(XFile file) async {
-  // File? croppedImage = await ImageCropper.cropImage(sourcePath: file.path);
-  //
-  //   if (croppedImage != null) {
-  //     setState(() {
-  //       imageFile = croppedImage;
-  //     });
-  //   }
-  // }
+  // XFile? imageFile;
 
   void checkValue() {
     String fullname = fullNameController.text.trim();
+    String phone = phoneController.text.toString().trim();
 
-    if (fullname == "") {
+    if (fullname == "" || phone == "") {
       print("Please fill all fields");
     } else {
       uploadData();
@@ -67,11 +52,70 @@ class _complateprofileState extends State<CompleteProfile> {
     String fullname = fullNameController.text.trim();
     widget.userModel.fullname = fullname;
 
+    String phonenumber = phoneController.text.toString().trim();
+    widget.userModel.phonenumber = phonenumber;
+
+
     await FirebaseFirestore.instance
         .collection("users")
         .doc(widget.userModel.uid)
         .set(widget.userModel.toMap());
+
+
+    // FirebaseFirestore.instance.collection("users").doc(widget.userModel.uid).set(widget.userModel.toMap());
   }
+
+  final ImagePicker _imagePicker = ImagePicker();
+  String? imageUrl;
+  // bool isLoading = false;
+  Future<void> pickImage() async {
+    try {
+      XFile? res = await _imagePicker.pickImage(source: ImageSource.gallery);
+      if (res != null) {
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red,
+          content: Text("failed to pick image : $e")));
+    }
+  }
+
+  Future<void> uploadImageToFirebase(File image) async {
+    // setState(() {
+    //   isLoading = true;
+    // });
+    try {
+      Reference reference = FirebaseStorage.instance
+          .ref()
+          .child("images/${DateTime.now().microsecondsSinceEpoch}.png");
+      await reference.putFile(image).whenComplete(() {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
+            content: Text("Upload successfully"),
+          ),
+        );
+      });
+      imageUrl = await reference.getDownloadURL();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text("failed upload image : $e"),
+        ),
+      );
+    }
+    // setState(() {
+    //   isLoading = false;
+    // });
+  }
+
+
+
+
+
+
 
   void showPhotoOption() {
     showDialog(
@@ -84,14 +128,15 @@ class _complateprofileState extends State<CompleteProfile> {
               children: [
                 ListTile(
                   onTap: () {
-                    // selectImage(ImageSource.gallery);
+                     // pickImage();
                   },
+
                   leading: Icon(Icons.photo_album),
                   title: Text("Select from Gallery"),
                 ),
                 ListTile(
                   onTap: () {
-                    // selectImage(ImageSource.camera);
+                    // pickImage();
                   },
                   leading: Icon(Icons.camera_alt),
                   title: Text("Take a photo"),
@@ -118,10 +163,24 @@ class _complateprofileState extends State<CompleteProfile> {
               SizedBox(
                 height: 20,
               ),
-              CircleAvatar(
-                radius: 60,
-                backgroundColor: Theme.of(context).colorScheme.secondary,
-                child: Icon(Icons.person,color: Colors.white,size: 90,),
+              GestureDetector(
+                // onTap: showPhotoOption,
+                child: CircleAvatar(
+                    radius: 80,
+                    child: imageUrl == null
+                        ? Icon(
+                      Icons.person,
+                      size: 100.0,
+                      color: Colors.grey,
+                    )
+                        : SizedBox(
+                      height: 200,
+                      child: ClipOval(
+                          child: Image.network(
+                            imageUrl!,
+                            fit: BoxFit.cover,
+                          )),
+                    )),
               ),
               SizedBox(
                 height: 20,
@@ -135,6 +194,16 @@ class _complateprofileState extends State<CompleteProfile> {
               SizedBox(
                 height: 20,
               ),
+              TextField(
+                controller: phoneController,
+                keyboardType: TextInputType.phone,
+                maxLength: 10,
+                decoration: InputDecoration(
+                    counter: Offstage(),
+                    labelText: "Phone number"
+                ),
+              ),
+              SizedBox(height: 20,),
               CupertinoButton(
                 onPressed: () {
                   checkValue();
