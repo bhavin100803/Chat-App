@@ -233,7 +233,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
           text: msg,
           seen: false);
 
-
       FirebaseFirestore.instance
           .collection("chatrooms")
           .doc(widget.chatroom.chatroomid)
@@ -276,9 +275,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     try {
       Reference reference = FirebaseStorage.instance
           .ref()
-          .child("images/${DateTime
-          .now()
-          .microsecondsSinceEpoch}.png");
+          .child("images/${DateTime.now().microsecondsSinceEpoch}.png");
       await reference.putFile(image).whenComplete(() {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -301,8 +298,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       isLoading = false;
     });
   }
-
-
 
   final ImagePicker _picker = ImagePicker();
 
@@ -359,6 +354,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         child: Container(
           child: Column(
             children: [
+
               // This is where the chats will go
               Expanded(
                 child: Container(
@@ -374,20 +370,20 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                       if (snapshot.connectionState == ConnectionState.active) {
                         if (snapshot.hasData) {
                           QuerySnapshot dataSnapshot =
-                          snapshot.data as QuerySnapshot;
+                              snapshot.data as QuerySnapshot;
 
                           return ListView.builder(
                             reverse: true,
                             itemCount: dataSnapshot.docs.length,
                             itemBuilder: (context, index) {
                               MessageModel currentMessage =
-                              MessageModel.fromMap(dataSnapshot.docs[index]
-                                  .data() as Map<String, dynamic>);
+                                  MessageModel.fromMap(dataSnapshot.docs[index]
+                                      .data() as Map<String, dynamic>);
 
                               return Expanded(
                                 child: Column(
                                   crossAxisAlignment: (currentMessage.sender ==
-                                      widget.userModel.uid)
+                                          widget.userModel.uid)
                                       ? CrossAxisAlignment.end
                                       : CrossAxisAlignment.start,
                                   children: [
@@ -401,7 +397,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                       ),
                                       decoration: BoxDecoration(
                                         color: (currentMessage.sender ==
-                                            widget.userModel.uid)
+                                                widget.userModel.uid)
                                             ? Colors.grey.withOpacity(0.4)
                                             : Colors.grey.withOpacity(0.6),
                                         borderRadius: BorderRadius.circular(5),
@@ -409,8 +405,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                       child: SelectableText(
                                         currentMessage.text.toString(),
                                         style: TextStyle(
-                                          // color: Colors.white,
-                                        ),
+                                            // color: Colors.white,
+                                            ),
                                       ),
                                     ),
                                   ],
@@ -450,7 +446,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                         decoration: InputDecoration(
                             suffixIcon: IconButton(
                               onPressed: pickImage,
-                              icon: Icon(Icons.photo),),
+                              icon: Icon(Icons.photo),
+                            ),
                             border: InputBorder.none,
                             hintText: "Enter message"),
                       ),
@@ -463,7 +460,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                     // ),
                     GestureDetector(
                       onTap: showButton,
-                      child: Icon(Icons.attach_file),),
+                      child: Icon(Icons.attach_file),
+                    ),
                     IconButton(
                       onPressed: () {
                         sendMessage();
@@ -483,9 +481,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     );
   }
 
-
-
-
   void showButton() {
     showDialog(
         context: context,
@@ -499,13 +494,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                   onTap: () {
                     _pickAndShareImage();
                   },
-
                   leading: Icon(Icons.photo_album),
                   title: Text("Select Photo Gallery"),
                 ),
                 ListTile(
                   onTap: () {
-                     _pickAndShareVideo();
+                    _pickAndShareVideo();
                   },
                   leading: Icon(Icons.videocam),
                   title: Text("Select Video Gallery"),

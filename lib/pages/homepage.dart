@@ -6,7 +6,6 @@ import 'package:chatapp/pages/chatroompage.dart';
 import 'package:chatapp/pages/loginpage.dart';
 import 'package:chatapp/pages/searchpage.dart';
 import 'package:chatapp/pages/settingpage.dart';
-import 'package:chatapp/provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -283,7 +282,9 @@ class _homepageState extends State<HomePage> {
           onPressed: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
               return SearchPage(
-                  userModel: widget.userModel, firebaseUser: widget.firebaseUser);
+                  userModel: widget.userModel,
+                  firebaseUser: widget.firebaseUser,
+              );
             }));
           },
           child: Icon(

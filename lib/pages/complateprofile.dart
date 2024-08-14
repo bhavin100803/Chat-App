@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'dart:math';
-
 import 'package:chatapp/pages/homepage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -24,10 +22,10 @@ class CompleteProfile extends StatefulWidget {
 }
 
 class _complateprofileState extends State<CompleteProfile> {
+
   TextEditingController fullNameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
 
-  // XFile? imageFile;
 
   void checkValue() {
     String fullname = fullNameController.text.trim();
@@ -67,11 +65,25 @@ class _complateprofileState extends State<CompleteProfile> {
 
   final ImagePicker _imagePicker = ImagePicker();
   String? imageUrl;
-  // bool isLoading = false;
+  bool isLoading = false;
   Future<void> pickImage() async {
     try {
       XFile? res = await _imagePicker.pickImage(source: ImageSource.gallery);
       if (res != null) {
+        await uploadImageToFirebase(File(res.path));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red,
+          content: Text("failed to pick image : $e")));
+    }
+  }
+  Future<void> cameraImage() async {
+    try {
+      XFile? res = await _imagePicker.pickImage(source: ImageSource.camera);
+      if (res != null) {
+        await uploadImageToFirebase(File(res.path));
+        print(res.path);
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -81,9 +93,9 @@ class _complateprofileState extends State<CompleteProfile> {
   }
 
   Future<void> uploadImageToFirebase(File image) async {
-    // setState(() {
-    //   isLoading = true;
-    // });
+    setState(() {
+      isLoading = true;
+    });
     try {
       Reference reference = FirebaseStorage.instance
           .ref()
@@ -91,7 +103,7 @@ class _complateprofileState extends State<CompleteProfile> {
       await reference.putFile(image).whenComplete(() {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.green,
             duration: Duration(seconds: 2),
             content: Text("Upload successfully"),
           ),
@@ -106,13 +118,10 @@ class _complateprofileState extends State<CompleteProfile> {
         ),
       );
     }
-    // setState(() {
-    //   isLoading = false;
-    // });
+    setState(() {
+      isLoading = false;
+    });
   }
-
-
-
 
 
 
@@ -128,7 +137,7 @@ class _complateprofileState extends State<CompleteProfile> {
               children: [
                 ListTile(
                   onTap: () {
-                     // pickImage();
+                      pickImage();
                   },
 
                   leading: Icon(Icons.photo_album),
@@ -136,10 +145,10 @@ class _complateprofileState extends State<CompleteProfile> {
                 ),
                 ListTile(
                   onTap: () {
-                    // pickImage();
+                     cameraImage();
                   },
                   leading: Icon(Icons.camera_alt),
-                  title: Text("Take a photo"),
+                  title: Text("Take a photo from Camera"),
                 )
               ],
             ),
@@ -157,31 +166,56 @@ class _complateprofileState extends State<CompleteProfile> {
       ),
       body: SafeArea(
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 40),
+          padding: EdgeInsets.symmetric(horizontal: 15,vertical: 5),
           child: ListView(
+            shrinkWrap: true,
             children: [
-              SizedBox(
-                height: 20,
+              Stack(
+                children: [
+                  Center(
+                    child: CircleAvatar(
+                        radius: 100,
+                        child: imageUrl == null
+                            ? Icon(
+                          Icons.person,
+                          size: 200.0,
+                          color: Colors.grey,
+                        )
+                            : SizedBox(
+                          height: 200,
+                          child: ClipOval(
+                              child: Image.network(
+                                imageUrl!,
+                                fit: BoxFit.fill,
+                              )),
+                        )),
+                  ),
+                  if (isLoading)
+                    Positioned(
+                      top: 85.0,
+                        left: 160.0,
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                          ),
+                        )),
+                  Positioned(
+                    left: 250,
+                    top: 120,
+                    child: GestureDetector(
+                      onTap: () {
+                         showPhotoOption();
+                      },
+                      child: Icon(
+                        Icons.camera_alt,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                    ),
+                  )
+                ],
               ),
-              GestureDetector(
-                // onTap: showPhotoOption,
-                child: CircleAvatar(
-                    radius: 80,
-                    child: imageUrl == null
-                        ? Icon(
-                      Icons.person,
-                      size: 100.0,
-                      color: Colors.grey,
-                    )
-                        : SizedBox(
-                      height: 200,
-                      child: ClipOval(
-                          child: Image.network(
-                            imageUrl!,
-                            fit: BoxFit.cover,
-                          )),
-                    )),
-              ),
+
               SizedBox(
                 height: 20,
               ),
