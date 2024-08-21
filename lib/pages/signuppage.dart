@@ -1,3 +1,4 @@
+import 'package:chatapp/colors.dart';
 import 'package:chatapp/pages/complateprofile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -88,7 +89,7 @@ class _singuppageState extends State<SignUpPage > {
                 children: [
 
                   Text("Chat App", style: TextStyle(
-                      color: Theme.of(context).colorScheme.secondary,
+                      color: color.thirdcolor,
                       fontSize: 45,
                       fontWeight: FontWeight.bold
                   ),),
@@ -98,7 +99,13 @@ class _singuppageState extends State<SignUpPage > {
                   TextField(
                     controller: emailController,
                     decoration: InputDecoration(
-                        labelText: "Email Address"
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: color.thirdcolor),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: color.thirdcolor),
+                        ),
+                        labelText: "Email Address" ,labelStyle: TextStyle(color: color.thirdcolor)
                     ),
                   ),
 
@@ -108,7 +115,13 @@ class _singuppageState extends State<SignUpPage > {
                     controller: passwordController,
                     obscureText: true,
                     decoration: InputDecoration(
-                        labelText: "Password"
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: color.thirdcolor),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: color.thirdcolor),
+                        ),
+                        labelText: "Password",labelStyle: TextStyle(color: color.thirdcolor)
                     ),
                   ),
 
@@ -118,17 +131,23 @@ class _singuppageState extends State<SignUpPage > {
                     controller: cPasswordController,
                     obscureText: true,
                     decoration: InputDecoration(
-                        labelText: "Confirm Password"
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: color.thirdcolor),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: color.thirdcolor),
+                        ),
+                        labelText: "Confirm Password",labelStyle: TextStyle(color: color.thirdcolor)
                     ),
                   ),
 
-                  SizedBox(height: 20,),
+                  SizedBox(height: 50,),
 
                   CupertinoButton(
                     onPressed: () {
                       checkValues();
                     },
-                    color: Theme.of(context).colorScheme.secondary,
+                    color: color.thirdcolor,
                     child: Text("Sign Up"),
                   ),
 
@@ -152,7 +171,7 @@ class _singuppageState extends State<SignUpPage > {
                 Navigator.pop(context);
               },
               child: Text("Log In", style: TextStyle(
-                  fontSize: 16
+                  fontSize: 16,color: color.thirdcolor
               ),),
             ),
 

@@ -1,3 +1,4 @@
+import 'package:chatapp/colors.dart';
 import 'package:flutter/material.dart';
 
 class UIHelper {
@@ -10,7 +11,9 @@ class UIHelper {
           mainAxisSize: MainAxisSize.min,
           children: [
 
-            CircularProgressIndicator(),
+            CircularProgressIndicator(
+              color: color.thirdcolor,
+            ),
 
             SizedBox(height: 30,),
 

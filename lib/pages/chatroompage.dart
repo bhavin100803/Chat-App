@@ -188,6 +188,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:chatapp/colors.dart';
 import 'package:chatapp/main.dart';
 import 'package:chatapp/models/ChatRoomModel.dart';
 import 'package:chatapp/models/MessageModel.dart';
@@ -196,6 +197,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -322,6 +324,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: color.fourcolor,
         title: Column(
           children: [
             Row(
@@ -333,9 +336,15 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                   width: 10,
                 ),
                 Text(widget.targetUser.fullname.toString()),
-                SizedBox(
-                  width: 130,
-                ),
+
+                // IconButton(
+                //     onPressed: () {
+                //       FirebaseFirestore.instance
+                //           .collection("chatrooms")
+                //           .doc(widget.chatroom.chatroomid)
+                //           .delete();
+                //     },
+                //     icon: Icon(Icons.clear))
                 // TextButton(
                 //   onPressed: (){
                 //     Navigator.push(
@@ -350,129 +359,226 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
           ],
         ),
       ),
-      body: SafeArea(
+      body: SingleChildScrollView(
         child: Container(
+          color: color.fourcolor,
           child: Column(
             children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                height: MediaQuery.sizeOf(context).height / 1.2,
+                child: StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection("chatrooms")
+                      .doc(widget.chatroom.chatroomid)
+                      .collection("messages")
+                      .orderBy("createdon", descending: true)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.active) {
+                      if (snapshot.hasData) {
+                        QuerySnapshot dataSnapshot =
+                            snapshot.data as QuerySnapshot;
 
-              // This is where the chats will go
-              Expanded(
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: StreamBuilder(
-                    stream: FirebaseFirestore.instance
-                        .collection("chatrooms")
-                        .doc(widget.chatroom.chatroomid)
-                        .collection("messages")
-                        .orderBy("createdon", descending: true)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.active) {
-                        if (snapshot.hasData) {
-                          QuerySnapshot dataSnapshot =
-                              snapshot.data as QuerySnapshot;
+                        return ListView.builder(
+                          reverse: true,
+                          itemCount: dataSnapshot.docs.length,
+                          itemBuilder: (context, index) {
+                            MessageModel currentMessage = MessageModel.fromMap(
+                                dataSnapshot.docs[index].data()
+                                    as Map<String, dynamic>);
 
-                          return ListView.builder(
-                            reverse: true,
-                            itemCount: dataSnapshot.docs.length,
-                            itemBuilder: (context, index) {
-                              MessageModel currentMessage =
-                                  MessageModel.fromMap(dataSnapshot.docs[index]
-                                      .data() as Map<String, dynamic>);
-
-                              return Expanded(
-                                child: Column(
-                                  crossAxisAlignment: (currentMessage.sender ==
-                                          widget.userModel.uid)
-                                      ? CrossAxisAlignment.end
-                                      : CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      margin: EdgeInsets.symmetric(
-                                        vertical: 2,
-                                      ),
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: 10,
-                                        horizontal: 10,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: (currentMessage.sender ==
-                                                widget.userModel.uid)
-                                            ? Colors.grey.withOpacity(0.4)
-                                            : Colors.grey.withOpacity(0.6),
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: SelectableText(
-                                        currentMessage.text.toString(),
-                                        style: TextStyle(
-                                            // color: Colors.white,
-                                            ),
-                                      ),
+                            return GestureDetector(
+                              onDoubleTap: () {
+                                print(
+                                    dataSnapshot.docs[index].data().toString());
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15.0)),
+                                        content: Container(
+                                          height: 120.0,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    "Are you sure?",
+                                                    style: TextStyle(
+                                                        fontSize: 24,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  )
+                                                ],
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    "Delete This Message",
+                                                    style:
+                                                        TextStyle(fontSize: 18),
+                                                  )
+                                                ],
+                                              ),
+                                              SizedBox(
+                                                height: 8.0,
+                                              ),
+                                              SizedBox(
+                                                height: 20.0,
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                children: [
+                                                  GestureDetector(
+                                                      onTap: () {
+                                                        FirebaseFirestore
+                                                            .instance
+                                                            .collection(
+                                                                "chatrooms")
+                                                            .doc(widget.chatroom
+                                                                .chatroomid)
+                                                            .collection(
+                                                                "messages")
+                                                            .doc(currentMessage
+                                                                .messageid)
+                                                            .delete()
+                                                            .then((onValue) {
+                                                          Navigator.pop(
+                                                              context);
+                                                        });
+                                                      },
+                                                      child: Text(
+                                                        "Yes",
+                                                        style: TextStyle(
+                                                            fontSize: 18,
+                                                            color: Colors.blue),
+                                                      )),
+                                                  SizedBox(
+                                                    width: 40.0,
+                                                  ),
+                                                  GestureDetector(
+                                                      onTap: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text(
+                                                        "No",
+                                                        style: TextStyle(
+                                                            fontSize: 18,
+                                                            color: Colors.blue),
+                                                      ))
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    });
+                              },
+                              child: Column(
+                                crossAxisAlignment: (currentMessage.sender ==
+                                        widget.userModel.uid)
+                                    ? CrossAxisAlignment.end
+                                    : CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    margin: EdgeInsets.symmetric(
+                                      vertical: 2,
                                     ),
-                                  ],
-                                ),
-                              );
-                            },
-                          );
-                        } else if (snapshot.hasError) {
-                          return Center(
-                            child: Text(
-                                "An error occured! Please check your internet connection."),
-                          );
-                        } else {
-                          return Center(
-                            child: Text("Say hi to your new friend"),
-                          );
-                        }
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 10,
+                                      horizontal: 10,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: (currentMessage.sender ==
+                                              widget.userModel.uid)
+                                          ? color.thirdcolor
+                                          : Colors.grey.withOpacity(0.6),
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    child: SelectableText(
+                                      style: TextStyle(color: Colors.white),
+                                      currentMessage.text.toString(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      } else if (snapshot.hasError) {
+                        return Center(
+                          child: Text(
+                              "An error occured! Please check your internet connection."),
+                        );
                       } else {
                         return Center(
-                          child: CircularProgressIndicator(),
+                          child: Text("Say hi to your new friend"),
                         );
                       }
-                    },
-                  ),
+                    } else {
+                      return Center(
+                        child: CircularProgressIndicator(
+                          color: color.thirdcolor,
+                        ),
+                      );
+                    }
+                  },
                 ),
               ),
-
-              Container(
-                // color: Colors.grey[200],
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                child: Row(
-                  children: [
-                    Flexible(
-                      child: TextField(
-                        controller: messageController,
-                        maxLines: null,
-                        decoration: InputDecoration(
-                            suffixIcon: IconButton(
-                              onPressed: pickImage,
-                              icon: Icon(Icons.photo),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    children: [
+                      Container(
+                        child: TextField(
+                          controller: messageController,
+                          maxLines: null,
+                          decoration: InputDecoration(
+                              suffixIcon: IconButton(
+                                onPressed: pickImage,
+                                icon: Icon(Icons.photo),
+                              ),
+                              border: InputBorder.none,
+                              hintText: "Enter message"),
+                        ),
+                        height: 50.00,
+                        width: 320.00,
+                      ),
+                    ],
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: showButton,
+                            child: Icon(Icons.attach_file),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              sendMessage();
+                            },
+                            icon: Icon(
+                              Icons.send,
+                              // color: Colors.black,
                             ),
-                            border: InputBorder.none,
-                            hintText: "Enter message"),
+                          ),
+                        ],
                       ),
-                    ),
-                    // Row(
-                    //   children: [
-                    //     IconButton(onPressed: _pickAndShareImage,
-                    //         icon: Icon(Icons.camera))
-                    //   ],
-                    // ),
-                    GestureDetector(
-                      onTap: showButton,
-                      child: Icon(Icons.attach_file),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        sendMessage();
-                      },
-                      icon: Icon(
-                        Icons.send,
-                        // color: Colors.black,
-                      ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),

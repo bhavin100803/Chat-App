@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:chatapp/colors.dart';
 import 'package:chatapp/pages/homepage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,10 +23,8 @@ class CompleteProfile extends StatefulWidget {
 }
 
 class _complateprofileState extends State<CompleteProfile> {
-
   TextEditingController fullNameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
-
 
   void checkValue() {
     String fullname = fullNameController.text.trim();
@@ -53,12 +52,10 @@ class _complateprofileState extends State<CompleteProfile> {
     String phonenumber = phoneController.text.toString().trim();
     widget.userModel.phonenumber = phonenumber;
 
-
     await FirebaseFirestore.instance
         .collection("users")
         .doc(widget.userModel.uid)
         .set(widget.userModel.toMap());
-
 
     // FirebaseFirestore.instance.collection("users").doc(widget.userModel.uid).set(widget.userModel.toMap());
   }
@@ -78,6 +75,7 @@ class _complateprofileState extends State<CompleteProfile> {
           content: Text("failed to pick image : $e")));
     }
   }
+
   Future<void> cameraImage() async {
     try {
       XFile? res = await _imagePicker.pickImage(source: ImageSource.camera);
@@ -123,9 +121,6 @@ class _complateprofileState extends State<CompleteProfile> {
     });
   }
 
-
-
-
   void showPhotoOption() {
     showDialog(
         context: context,
@@ -137,17 +132,22 @@ class _complateprofileState extends State<CompleteProfile> {
               children: [
                 ListTile(
                   onTap: () {
-                      pickImage();
+                    pickImage();
                   },
-
-                  leading: Icon(Icons.photo_album),
+                  leading: Icon(
+                    Icons.photo_album,
+                    color: color.thirdcolor,
+                  ),
                   title: Text("Select from Gallery"),
                 ),
                 ListTile(
                   onTap: () {
-                     cameraImage();
+                    cameraImage();
                   },
-                  leading: Icon(Icons.camera_alt),
+                  leading: Icon(
+                    Icons.camera_alt,
+                    color: color.thirdcolor,
+                  ),
                   title: Text("Take a photo from Camera"),
                 )
               ],
@@ -159,71 +159,85 @@ class _complateprofileState extends State<CompleteProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // backgroundColor: color.fourcolor,
       appBar: AppBar(
-        centerTitle: true,
         automaticallyImplyLeading: false,
-        title: Text("Complete Profile"),
+        title: Text(
+          "Complete Profile",
+          style:
+              TextStyle(color: color.thirdcolor, fontWeight: FontWeight.bold),
+        ),
+        // backgroundColor: color.fourcolor,
       ),
       body: SafeArea(
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 15,vertical: 5),
+          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
           child: ListView(
             shrinkWrap: true,
             children: [
               Stack(
                 children: [
                   Center(
-                    child: CircleAvatar(
-                        radius: 100,
-                        child: imageUrl == null
-                            ? Icon(
-                          Icons.person,
-                          size: 200.0,
-                          color: Colors.grey,
-                        )
-                            : SizedBox(
-                          height: 200,
-                          child: ClipOval(
-                              child: Image.network(
-                                imageUrl!,
-                                fit: BoxFit.fill,
-                              )),
-                        )),
+                    child: GestureDetector(
+                      onTap: showPhotoOption,
+                      child: CircleAvatar(
+                          backgroundColor: color.thirdcolor.withOpacity(0.5),
+                          radius: 100,
+                          child: imageUrl == null
+                              ? Icon(
+                                  Icons.person,
+                                  size: 200.0,
+                                  color: color.thirdcolor,
+                                )
+                              : SizedBox(
+                                  height: 200,
+                                  child: ClipOval(
+                                      child: Image.network(
+                                    imageUrl!,
+                                    fit: BoxFit.fill,
+                                  )),
+                                )),
+                    ),
                   ),
                   if (isLoading)
                     Positioned(
-                      top: 85.0,
+                        top: 85.0,
                         left: 160.0,
                         child: Center(
                           child: CircularProgressIndicator(
-                            color: Colors.white,
+                            color: color.thirdcolor,
                           ),
                         )),
-                  Positioned(
-                    left: 250,
-                    top: 120,
-                    child: GestureDetector(
-                      onTap: () {
-                         showPhotoOption();
-                      },
-                      child: Icon(
-                        Icons.camera_alt,
-                        color: Colors.white,
-                        size: 30,
-                      ),
-                    ),
-                  )
+                  // Positioned(
+                  //   left: 250,
+                  //   top: 120,
+                  //   child: GestureDetector(
+                  //     onTap: () {
+                  //        showPhotoOption();
+                  //     },
+                  //     child: Icon(
+                  //       Icons.camera_alt,
+                  //       color:color.my_Primariycolor,
+                  //       size: 30,
+                  //     ),
+                  //   ),
+                  // )
                 ],
               ),
-
               SizedBox(
                 height: 20,
               ),
               TextField(
                 controller: fullNameController,
                 decoration: InputDecoration(
-                  labelText: "Full Name",
-                ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: color.thirdcolor),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: color.thirdcolor),
+                    ),
+                    labelText: "Full Name",
+                    labelStyle: TextStyle(color: color.thirdcolor)),
               ),
               SizedBox(
                 height: 20,
@@ -233,17 +247,29 @@ class _complateprofileState extends State<CompleteProfile> {
                 keyboardType: TextInputType.phone,
                 maxLength: 10,
                 decoration: InputDecoration(
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: color.thirdcolor),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: color.thirdcolor),
+                    ),
                     counter: Offstage(),
-                    labelText: "Phone number"
-                ),
+                    labelText: "Phone number",
+                    labelStyle: TextStyle(color: color.thirdcolor)),
               ),
-              SizedBox(height: 20,),
+              SizedBox(
+                height: 40,
+              ),
               CupertinoButton(
                 onPressed: () {
                   checkValue();
                 },
-                color: Theme.of(context).colorScheme.secondary,
-                child: Text("Submit"),
+                color: color.thirdcolor,
+                child: Text(
+                  "Submit",
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
               ),
             ],
           ),

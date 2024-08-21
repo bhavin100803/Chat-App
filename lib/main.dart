@@ -2,6 +2,8 @@ import 'package:chatapp/models/UserModel.dart';
 import 'package:chatapp/models/firebasehelper.dart';
 import 'package:chatapp/pages/homepage.dart';
 import 'package:chatapp/pages/loginpage.dart';
+import 'package:chatapp/pages/otppage.dart';
+import 'package:chatapp/pages/splashscreen.dart';
 import 'package:chatapp/provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -44,6 +46,16 @@ Future main() async {
     runApp(MyApp());
   }
 }
+
+
+// void main()async{
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await Firebase.initializeApp();
+//   runApp(MaterialApp(
+//     home: MyPhone(),
+//     debugShowCheckedModeBanner: false,
+//   ));
+// }
 
 // Not Login
 class MyApp extends StatelessWidget {

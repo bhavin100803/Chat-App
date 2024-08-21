@@ -1,3 +1,4 @@
+import 'package:chatapp/colors.dart';
 import 'package:chatapp/pages/homepage.dart';
 import 'package:chatapp/pages/signuppage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -80,7 +81,7 @@ class _loginpageState extends State<LoginPage > {
                 children: [
 
                   Text("Chat App", style: TextStyle(
-                      color: Theme.of(context).colorScheme.secondary,
+                      color: color.thirdcolor,
                       fontSize: 45,
                       fontWeight: FontWeight.bold
                   ),),
@@ -89,8 +90,15 @@ class _loginpageState extends State<LoginPage > {
 
                   TextField(
                     controller: emailController,
+                    cursorColor: color.thirdcolor,
                     decoration: InputDecoration(
-                        labelText: "Email Address"
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: color.thirdcolor),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: color.thirdcolor),
+                        ),
+                        labelText: "Email Address",labelStyle: TextStyle(color: color.thirdcolor)
                     ),
                   ),
 
@@ -100,17 +108,23 @@ class _loginpageState extends State<LoginPage > {
                     controller: passwordController,
                     obscureText: true,
                     decoration: InputDecoration(
-                        labelText: "Password"
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: color.thirdcolor),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: color.thirdcolor),
+                        ),
+                        labelText: "Password",labelStyle: TextStyle(color: color.thirdcolor)
                     ),
                   ),
 
-                  SizedBox(height: 20,),
+                  SizedBox(height: 50,),
 
                   CupertinoButton(
                     onPressed: () {
                       checkValues();
                     },
-                    color: Theme.of(context).colorScheme.secondary,
+                    color: color.thirdcolor,
                     child: Text("Log In"),
                   ),
 
@@ -141,7 +155,7 @@ class _loginpageState extends State<LoginPage > {
                 );
               },
               child: Text("Sign Up", style: TextStyle(
-                  fontSize: 16
+                  fontSize: 16,color: color.thirdcolor
               ),),
             ),
 
