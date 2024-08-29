@@ -533,52 +533,60 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                   },
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    children: [
-                      Container(
-                        child: TextField(
-                          controller: messageController,
-                          maxLines: null,
-                          decoration: InputDecoration(
-                              suffixIcon: IconButton(
-                                onPressed: pickImage,
-                                icon: Icon(Icons.photo),
-                              ),
-                              border: InputBorder.none,
-                              hintText: "Enter message"),
+              Container(
+                // width: MediaQuery.sizeOf(context).width,
+                child: Row(
+                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+                          child: TextField(
+                            controller: messageController,
+                            maxLines: null,
+                            decoration: InputDecoration(
+                                // suffixIcon: IconButton(
+                                //   onPressed: pickImage,
+                                //   icon: Icon(Icons.photo),
+                                // ),
+                                border: InputBorder.none,
+                                hintText: "Enter message"),
+                          ),
+                          height: MediaQuery.sizeOf(context).height/14,
+                          width: MediaQuery.sizeOf(context).width/3,
                         ),
-                        height: 50.00,
-                        width: 320.00,
-                      ),
-                    ],
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: showButton,
-                            child: Icon(Icons.attach_file),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              sendMessage();
-                            },
-                            icon: Icon(
-                              Icons.send,
-                              // color: Colors.black,
+                      ],
+                       crossAxisAlignment: CrossAxisAlignment.center,
+                    ),
+                    Column(
+                       crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Row(
+                          children: [
+                            IconButton(
+                              onPressed: pickImage,
+                              icon: Icon(Icons.photo),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
+                            GestureDetector(
+                              onTap: showButton,
+                              child: Icon(Icons.attach_file),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                sendMessage();
+                              },
+                              icon: Icon(
+                                Icons.send,
+                                // color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -598,6 +606,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               children: [
                 ListTile(
                   onTap: () {
+                    Navigator.pop(context);
                     _pickAndShareImage();
                   },
                   leading: Icon(Icons.photo_album),
@@ -605,6 +614,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                 ),
                 ListTile(
                   onTap: () {
+                    Navigator.pop(context);
                     _pickAndShareVideo();
                   },
                   leading: Icon(Icons.videocam),

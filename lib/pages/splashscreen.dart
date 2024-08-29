@@ -1,127 +1,40 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:async';
+
+import 'package:chatapp/colors.dart';
+import 'package:chatapp/pages/loginpage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'otppage.dart';
+import 'boardingscreen.dart';
 
-class MyPhone extends StatefulWidget {
-  const MyPhone({super.key,});
-
-  static String verify="";
+class Splashscreen extends StatefulWidget {
+  const Splashscreen({super.key});
 
   @override
-  State<MyPhone> createState() => _MyPhoneState();
+  State<Splashscreen> createState() => _SplashscreenState();
 }
 
-class _MyPhoneState extends State<MyPhone> {
-
-  TextEditingController countrycode = TextEditingController();
-  // TextEditingController PhoneController = TextEditingController();
-  var phone ="";
-
+class _SplashscreenState extends State<Splashscreen> {
   @override
   void initState() {
-    countrycode.text="+91";
     super.initState();
+    Timer(Duration(seconds: 3), () {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => OnboardingScreens()));
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-        body: Container(
-          margin: EdgeInsets.only(left: 25, right: 25),
-          alignment: Alignment.center,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Phone Verificatinon",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  "We need to register phone before getting started !",
-                  style: TextStyle(fontSize: 20),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 30,),
-                Container(
-                  height: 55,
-                  decoration: BoxDecoration(
-                      border: Border.all(width: 1, color: Colors.grey),
-                      borderRadius: BorderRadius.circular(10)),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 10,
-                      ),
-                      SizedBox(
-                        width: 30,
-                        child: TextField(
-                          controller: countrycode,
-                          decoration: InputDecoration(border: InputBorder.none),
-                        ),
-                      ),
-
-                      Text(
-                        " | ",
-                        style: TextStyle(fontSize: 33, color: Colors.grey),
-                      ),
-                      SizedBox(
-                        height: 40,
-                      ),
-                      Expanded(
-                          child: TextField(
-                            keyboardType: TextInputType.phone,
-                            onChanged: (value){
-                              phone=value;
-                            },
-                            decoration: InputDecoration(
-                                border: InputBorder.none, hintText: "Phone"),
-                          ))
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                SizedBox(
-                  height: 45,
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () async
-                    {
-                      await FirebaseAuth.instance.verifyPhoneNumber(
-                         phoneNumber: "${countrycode.text + phone}",
-                        verificationCompleted: (PhoneAuthCredential credential) {},
-                        verificationFailed: (FirebaseAuthException ex) {},
-                        codeSent: (String verificationId, int? resendToken) {
-                            MyPhone.verify = verificationId;
-                          //  Navigator.push(context, MaterialPageRoute(builder: (context)=>MyOtp(verificationid: verificationId))
-                          // );
-                        },
-                        codeAutoRetrievalTimeout: (String verificationId) {},
-                      );
-                       Navigator.push(context, MaterialPageRoute(builder: (context)=>MyOtp(verificationid: '',)));
-
-                    },
-                    child: Text(
-                      "Send the code",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green.shade600,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10))),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ));
+      body: Container(
+        color: color.thirdcolor,
+        child: Center(
+            child: Text(
+          "Chat App",
+          style: TextStyle(color: Colors.white, fontSize: 40),
+        )),
+      ),
+    );
   }
 }

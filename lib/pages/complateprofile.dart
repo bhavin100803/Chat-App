@@ -132,6 +132,7 @@ class _complateprofileState extends State<CompleteProfile> {
               children: [
                 ListTile(
                   onTap: () {
+                    Navigator.pop(context);
                     pickImage();
                   },
                   leading: Icon(
@@ -142,6 +143,7 @@ class _complateprofileState extends State<CompleteProfile> {
                 ),
                 ListTile(
                   onTap: () {
+                    Navigator.pop(context);
                     cameraImage();
                   },
                   leading: Icon(

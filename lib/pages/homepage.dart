@@ -4,7 +4,7 @@ import 'package:chatapp/colors.dart';
 import 'package:chatapp/models/ChatRoomModel.dart';
 import 'package:chatapp/models/firebasehelper.dart';
 import 'package:chatapp/pages/chatroompage.dart';
-import 'package:chatapp/pages/loginpage.dart';
+import 'package:chatapp/pages/myphone.dart';
 import 'package:chatapp/pages/searchpage.dart';
 import 'package:chatapp/pages/settingpage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -98,7 +98,7 @@ class _homepageState extends State<HomePage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) {
-                    return LoginPage();
+                    return MyPhone();
                   }),
                 );
               },

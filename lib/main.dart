@@ -1,8 +1,6 @@
 import 'package:chatapp/models/UserModel.dart';
 import 'package:chatapp/models/firebasehelper.dart';
 import 'package:chatapp/pages/homepage.dart';
-import 'package:chatapp/pages/loginpage.dart';
-import 'package:chatapp/pages/otppage.dart';
 import 'package:chatapp/pages/splashscreen.dart';
 import 'package:chatapp/provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -49,10 +47,10 @@ Future main() async {
 
 
 // void main()async{
-//   WidgetsFlutterBinding.ensureInitialized();
-//   await Firebase.initializeApp();
+//   // WidgetsFlutterBinding.ensureInitialized();
+//   // await Firebase.initializeApp();
 //   runApp(MaterialApp(
-//     home: MyPhone(),
+//     home: OnboardingScreens(),
 //     debugShowCheckedModeBanner: false,
 //   ));
 // }
@@ -71,7 +69,7 @@ class MyApp extends StatelessWidget {
             return MaterialApp(
               themeMode: notifire.isDark? ThemeMode.dark : ThemeMode.light,
               darkTheme: notifire.isDark? notifire.darkTheme : notifire.lightTheme,
-              home: LoginPage(),
+              home: Splashscreen(),
               debugShowCheckedModeBanner: false,
             );
           }

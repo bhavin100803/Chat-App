@@ -4,12 +4,14 @@ import 'package:chatapp/colors.dart';
 import 'package:chatapp/main.dart';
 import 'package:chatapp/models/ChatRoomModel.dart';
 import 'package:chatapp/pages/chatroompage.dart';
+import 'package:chatapp/pages/shareimage_video.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../models/UserModel.dart';
+import 'fetchalluser.dart';
 
 class SearchPage extends StatefulWidget {
   final UserModel userModel;
@@ -216,6 +218,17 @@ class _searchpageState extends State<SearchPage> {
               ],
             ),
           ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: color.thirdcolor,
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context)=>allContact()));
+        },
+        child: Icon(
+          Icons.people_alt_outlined,
+          color: color.fourcolor,
+          size: 28,
         ),
       ),
     );

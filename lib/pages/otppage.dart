@@ -1,12 +1,16 @@
-import 'package:chatapp/pages/splashscreen.dart';
+import 'package:chatapp/colors.dart';
+import 'package:chatapp/models/UserModel.dart';
+import 'package:chatapp/pages/complateprofile.dart';
+import 'package:chatapp/pages/loginpage.dart';
+import 'package:chatapp/pages/myphone.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 
 class MyOtp extends StatefulWidget {
-   String verificationid;
-  MyOtp({super.key,required this.verificationid});
+  String verificationid;
+  MyOtp({super.key, required this.verificationid});
 
   @override
   State<MyOtp> createState() => _MyOtpState();
@@ -14,7 +18,7 @@ class MyOtp extends StatefulWidget {
 
 class _MyOtpState extends State<MyOtp> {
   TextEditingController otpController = TextEditingController();
-    final FirebaseAuth auth = FirebaseAuth.instance;
+  final FirebaseAuth auth = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     final defaultPinTheme = PinTheme(
@@ -68,7 +72,7 @@ class _MyOtpState extends State<MyOtp> {
                   height: 10,
                 ),
                 Text(
-                  "Phone Verificatinon",
+                  "Phone Verification ",
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(
@@ -99,41 +103,42 @@ class _MyOtpState extends State<MyOtp> {
                     onPressed: () async {
                       try {
                         PhoneAuthCredential credential =
-                        await PhoneAuthProvider.credential(
-                            verificationId: widget.verificationid,
-                            smsCode: otpController.text.toString());
-                        FirebaseAuth.instance.signInWithCredential(credential).then((value){
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>MyPhone()
-                          )
-                          );
-                        });
+                            PhoneAuthProvider.credential(
+                                verificationId: widget.verificationid,
+                                smsCode: code);
+                        await auth.signInWithCredential(credential);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => LoginPage()));
                       } catch (e) {
                         print("Wrong otp");
                       }
                     },
                     child: Text(
-                      "Verify phone number",
+                      "Verify",
                       style: TextStyle(color: Colors.white),
                     ),
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green.shade600,
+                        backgroundColor: color.thirdcolor,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10))),
                   ),
                 ),
-                // Row(
-                //   children: [
-                //     TextButton(
-                //         onPressed: () {
-                //           Navigator.pushNamedAndRemoveUntil(
-                //               context, 'phone', (route) => false);
-                //         },
-                //         child: Text(
-                //           "Edit Phone Number ?",
-                //           style: TextStyle(color: Colors.black),
-                //         ))
-                //   ],
-                // ),
+                Row(
+                  children: [
+                    TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => MyPhone()));
+                        },
+                        child: Text(
+                          "Edit Phone Number ?",
+                        ))
+                  ],
+                ),
               ],
             ),
           ),
