@@ -4,7 +4,6 @@ import 'package:chatapp/colors.dart';
 import 'package:chatapp/main.dart';
 import 'package:chatapp/models/ChatRoomModel.dart';
 import 'package:chatapp/pages/chatroompage.dart';
-import 'package:chatapp/pages/shareimage_video.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -194,6 +193,7 @@ class _searchpageState extends State<SearchPage> {
                     padding: EdgeInsets.only(bottom: 20.0),
                     height: 600.0,
                     child: ListView.builder(
+
                       itemCount: _users.length,
                       itemBuilder: (context, index) {
                         final user = _users[index];
@@ -223,7 +223,7 @@ class _searchpageState extends State<SearchPage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: color.thirdcolor,
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context)=>allContact()));
+           Navigator.push(context, MaterialPageRoute(builder: (context)=>ContactListScreen()));
         },
         child: Icon(
           Icons.people_alt_outlined,

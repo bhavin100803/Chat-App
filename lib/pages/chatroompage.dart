@@ -193,6 +193,7 @@ import 'package:chatapp/main.dart';
 import 'package:chatapp/models/ChatRoomModel.dart';
 import 'package:chatapp/models/MessageModel.dart';
 import 'package:chatapp/models/UserModel.dart';
+import 'package:chatapp/pages/shareaudio.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -581,6 +582,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                 // color: Colors.black,
                               ),
                             ),
+                            // IconButton(onPressed: (){
+                            //   // Navigator.push(context, MaterialPageRoute(builder: (context)=>Shareaudio()));
+                            // }, icon: Icon(Icons.mic))
                           ],
                         ),
                       ],
