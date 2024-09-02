@@ -25,6 +25,7 @@ class CompleteProfile extends StatefulWidget {
 class _complateprofileState extends State<CompleteProfile> {
   TextEditingController fullNameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
+  File? image;
 
   void checkValue() {
     String fullname = fullNameController.text.trim();
@@ -68,6 +69,9 @@ class _complateprofileState extends State<CompleteProfile> {
       XFile? res = await _imagePicker.pickImage(source: ImageSource.gallery);
       if (res != null) {
         await uploadImageToFirebase(File(res.path));
+        setState(() {
+          image = File(res.path);
+        });
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -81,6 +85,9 @@ class _complateprofileState extends State<CompleteProfile> {
       XFile? res = await _imagePicker.pickImage(source: ImageSource.camera);
       if (res != null) {
         await uploadImageToFirebase(File(res.path));
+        setState(() {
+          image = File(res.path);
+        });
         print(res.path);
       }
     } catch (e) {
@@ -183,22 +190,26 @@ class _complateprofileState extends State<CompleteProfile> {
                     child: GestureDetector(
                       onTap: showPhotoOption,
                       child: CircleAvatar(
-                          backgroundColor: color.thirdcolor.withOpacity(0.5),
-                          radius: 100,
-                          child: imageUrl == null
-                              ? Icon(
-                                  Icons.person,
-                                  size: 200.0,
-                                  color: color.thirdcolor,
-                                )
-                              : SizedBox(
-                                  height: 200,
-                                  child: ClipOval(
-                                      child: Image.network(
-                                    imageUrl!,
-                                    fit: BoxFit.fill,
-                                  )),
-                                )),
+                        backgroundImage: (image != null)
+                            ? FileImage(image!)
+                            : AssetImage("assets/img_2.jpg"),
+                        backgroundColor: color.thirdcolor.withOpacity(0.5),
+                        radius: 100,
+                        // child: imageUrl == null
+                        //     ? Icon(
+                        //         Icons.person,
+                        //         size: 200.0,
+                        //         color: color.thirdcolor,
+                        //       )
+                        //     : SizedBox(
+                        //         height: 200,
+                        //         child: ClipOval(
+                        //             child: Image.network(
+                        //           imageUrl!,
+                        //           fit: BoxFit.fill,
+                        //         )),
+                        //       ),
+                      ),
                     ),
                   ),
                   if (isLoading)

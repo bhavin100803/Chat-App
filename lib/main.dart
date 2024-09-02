@@ -1,6 +1,5 @@
 import 'package:chatapp/models/UserModel.dart';
 import 'package:chatapp/models/firebasehelper.dart';
-import 'package:chatapp/pages/fetchalluser.dart';
 import 'package:chatapp/pages/homepage.dart';
 import 'package:chatapp/pages/splashscreen.dart';
 import 'package:chatapp/provider/provider.dart';

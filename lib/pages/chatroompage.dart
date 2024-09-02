@@ -193,12 +193,12 @@ import 'package:chatapp/main.dart';
 import 'package:chatapp/models/ChatRoomModel.dart';
 import 'package:chatapp/models/MessageModel.dart';
 import 'package:chatapp/models/UserModel.dart';
-import 'package:chatapp/pages/shareaudio.dart';
+import 'package:chatapp/pages/forward_massage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -222,6 +222,7 @@ class ChatRoomPage extends StatefulWidget {
 
 class _ChatRoomPageState extends State<ChatRoomPage> {
   TextEditingController messageController = TextEditingController();
+  late Future<List<UserModel>> _usersFuture;
 
   void sendMessage() async {
     String msg = messageController.text.trim();
@@ -321,10 +322,130 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     }
   }
 
+  void deleteMessageForUser(MessageModel message) {
+    FirebaseFirestore.instance
+        .collection("chatrooms")
+        .doc(widget.chatroom.chatroomid)
+        .collection("messages")
+        .doc(message.messageid)
+        .delete();
+  }
+
+  void deleteMessageForAll(MessageModel message) {
+    FirebaseFirestore.instance
+        .collection("chatrooms")
+        .doc(widget.chatroom.chatroomid)
+        .collection("messages")
+        .doc(message.messageid)
+        .update({'text': 'This message was deleted', 'deleted': true});
+  }
+  // void forwardMessage(MessageModel message) async {
+  //   // Show a list of chat rooms to select where to forward the message
+  //   ChatRoomModel? selectedChatRoom = await _selectChatRoom();
+  //
+  //   if (selectedChatRoom != null) {
+  //     // Create a new message in the selected chat room with the same content
+  //     MessageModel newMessage = MessageModel(
+  //       messageid: uuid.v1(),
+  //       sender: widget.userModel.uid, // The current user forwarding the message
+  //       createdon: DateTime.now(),
+  //       text: message.text, // Forward the original message text
+  //       seen: false,
+  //     );
+  //
+  //     FirebaseFirestore.instance
+  //         .collection("chatrooms")
+  //         .doc(selectedChatRoom.chatroomid)
+  //         .collection("messages")
+  //         .doc(newMessage.messageid)
+  //         .set(newMessage.toMap());
+  //
+  //     // Update the last message in the selected chat room
+  //     selectedChatRoom.lastMessage = newMessage.text;
+  //     FirebaseFirestore.instance
+  //         .collection("chatrooms")
+  //         .doc(selectedChatRoom.chatroomid)
+  //         .set(selectedChatRoom.toMap());
+  //
+  //     log("Message Forwarded!");
+  //   }
+  // }
+
+  Future<ChatRoomModel?> _selectChatRoom() async {
+    return showDialog<ChatRoomModel>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Select Chat Room"),
+          content: Container(
+            height: 400.0, // Adjust height as needed
+            child: StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection("chatrooms")
+                    .where("users", arrayContains: widget.userModel.uid)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.active) {
+                    if (snapshot.hasData) {
+                      QuerySnapshot dataSnapshot =
+                          snapshot.data as QuerySnapshot;
+
+                      if (dataSnapshot.docs.isEmpty) {
+                        print(
+                            "No chat rooms found for user: ${widget.userModel.uid}");
+                        return Center(
+                          child: Text("No chat rooms found"),
+                        );
+                      }
+
+                      print(
+                          "Found ${dataSnapshot.docs.length} chat rooms for user: ${widget.userModel.uid}");
+                      return ListView.builder(
+                        itemCount: dataSnapshot.docs.length,
+                        itemBuilder: (context, index) {
+                          ChatRoomModel chatRoom = ChatRoomModel.fromMap(
+                            dataSnapshot.docs[index].data()
+                                as Map<String, dynamic>,
+                          );
+
+                          print("Chat Room ID: ${chatRoom.chatroomid}");
+
+                          return ListTile(
+                            title: Text(
+                                "Chat Room ${chatRoom.chatroomid}"), // Customize the display
+                            onTap: () {
+                              Navigator.pop(context, chatRoom);
+                            },
+                          );
+                        },
+                      );
+                    } else if (snapshot.hasError) {
+                      log("Error fetching chat rooms: ${snapshot.error}");
+                      return Center(
+                        child: Text("Error loading chat rooms"),
+                      );
+                    } else {
+                      return Center(
+                        child: Text("No chat rooms found"),
+                      );
+                    }
+                  } else {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                }),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        iconTheme: IconThemeData(color: color.five),
         backgroundColor: color.fourcolor,
         title: Column(
           children: [
@@ -336,7 +457,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                 SizedBox(
                   width: 10,
                 ),
-                Text(widget.targetUser.fullname.toString()),
+                Text(
+                  widget.targetUser.fullname.toString(),
+                  style: TextStyle(color: color.five),
+                ),
 
                 // IconButton(
                 //     onPressed: () {
@@ -390,98 +514,83 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                     as Map<String, dynamic>);
 
                             return GestureDetector(
-                              onDoubleTap: () {
+                              onLongPress: () {
                                 print(
                                     dataSnapshot.docs[index].data().toString());
-                                showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(15.0)),
-                                        content: Container(
-                                          height: 120.0,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    "Are you sure?",
-                                                    style: TextStyle(
-                                                        fontSize: 24,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  )
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    "Delete This Message",
-                                                    style:
-                                                        TextStyle(fontSize: 18),
-                                                  )
-                                                ],
-                                              ),
-                                              SizedBox(
-                                                height: 8.0,
-                                              ),
-                                              SizedBox(
-                                                height: 20.0,
-                                              ),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.end,
-                                                children: [
-                                                  GestureDetector(
-                                                      onTap: () {
-                                                        FirebaseFirestore
-                                                            .instance
-                                                            .collection(
-                                                                "chatrooms")
-                                                            .doc(widget.chatroom
-                                                                .chatroomid)
-                                                            .collection(
-                                                                "messages")
-                                                            .doc(currentMessage
-                                                                .messageid)
-                                                            .delete()
-                                                            .then((onValue) {
-                                                          Navigator.pop(
-                                                              context);
-                                                        });
-                                                      },
-                                                      child: Text(
-                                                        "Yes",
-                                                        style: TextStyle(
-                                                            fontSize: 18,
-                                                            color: Colors.blue),
-                                                      )),
-                                                  SizedBox(
-                                                    width: 40.0,
-                                                  ),
-                                                  GestureDetector(
-                                                      onTap: () {
-                                                        Navigator.pop(context);
-                                                      },
-                                                      child: Text(
-                                                        "No",
-                                                        style: TextStyle(
-                                                            fontSize: 18,
-                                                            color: Colors.blue),
-                                                      ))
-                                                ],
-                                              )
-                                            ],
+                                showModalBottomSheet(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return SafeArea(
+                                      child: Wrap(
+                                        children: [
+                                          ListTile(
+                                            leading: Icon(Icons.reply),
+                                            title: Text('Reply'),
+                                            onTap: () {
+                                              Navigator.pop(context);
+                                              // Handle reply
+                                              // replyToMessage(currentMessage);
+                                            },
                                           ),
-                                        ),
-                                      );
-                                    });
+                                          ListTile(
+                                            leading: Icon(Icons.copy),
+                                            title: Text('Copy'),
+                                            onTap: () {
+                                              Navigator.pop(context);
+                                              Clipboard.setData(ClipboardData(
+                                                  text: currentMessage.text ??
+                                                      ""));
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                    content: Text(
+                                                        'Message copied!')),
+                                              );
+                                            },
+                                          ),
+                                          ListTile(
+                                            leading: Icon(Icons.forward),
+                                            title: Text('Forward'),
+                                            onTap: () {
+                                              Navigator.pop(context);
+                                              // Handle forward
+                                              Navigator.pushReplacement(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ForwardMessageScreen(
+                                                            currentMessage:
+                                                                currentMessage),
+                                                  ));
+                                            },
+                                          ),
+                                          ListTile(
+                                            leading: Icon(Icons.delete),
+                                            title: Text('Delete for Me'),
+                                            onTap: () {
+                                              Navigator.pop(context);
+                                              deleteMessageForUser(
+                                                  currentMessage);
+                                            },
+                                          ),
+                                          if (currentMessage.sender ==
+                                              widget.userModel.uid)
+                                            ListTile(
+                                              leading:
+                                                  Icon(Icons.delete_forever),
+                                              title:
+                                                  Text('Delete for Everyone'),
+                                              onTap: () {
+                                                Navigator.pop(context);
+                                                deleteMessageForAll(
+                                                    currentMessage);
+                                              },
+                                            ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
                               },
                               child: Column(
                                 crossAxisAlignment: (currentMessage.sender ==
@@ -501,10 +610,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                       color: (currentMessage.sender ==
                                               widget.userModel.uid)
                                           ? color.thirdcolor
-                                          : Colors.grey.withOpacity(0.6),
+                                          : Colors.grey,
                                       borderRadius: BorderRadius.circular(5),
                                     ),
-                                    child: SelectableText(
+                                    child: Text(
                                       style: TextStyle(color: Colors.white),
                                       currentMessage.text.toString(),
                                     ),
@@ -537,12 +646,13 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               Container(
                 // width: MediaQuery.sizeOf(context).width,
                 child: Row(
-                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Column(
                       children: [
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 10),
                           child: TextField(
                             controller: messageController,
                             maxLines: null,
@@ -552,26 +662,33 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                 //   icon: Icon(Icons.photo),
                                 // ),
                                 border: InputBorder.none,
-                                hintText: "Enter message"),
+                                hintText: "Enter message",
+                                hintStyle: TextStyle(color: color.five)),
                           ),
-                          height: MediaQuery.sizeOf(context).height/14,
-                          width: MediaQuery.sizeOf(context).width/3,
+                          height: MediaQuery.sizeOf(context).height / 14,
+                          width: MediaQuery.sizeOf(context).width / 3,
                         ),
                       ],
-                       crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                     ),
                     Column(
-                       crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Row(
                           children: [
                             IconButton(
                               onPressed: pickImage,
-                              icon: Icon(Icons.photo),
+                              icon: Icon(
+                                Icons.photo,
+                                color: color.five,
+                              ),
                             ),
                             GestureDetector(
                               onTap: showButton,
-                              child: Icon(Icons.attach_file),
+                              child: Icon(
+                                Icons.attach_file,
+                                color: color.five,
+                              ),
                             ),
                             IconButton(
                               onPressed: () {
@@ -579,7 +696,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                               },
                               icon: Icon(
                                 Icons.send,
-                                // color: Colors.black,
+                                color: color.five,
                               ),
                             ),
                             // IconButton(onPressed: (){

@@ -1,8 +1,6 @@
 import 'dart:async';
 
 import 'package:chatapp/colors.dart';
-import 'package:chatapp/pages/loginpage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'boardingscreen.dart';

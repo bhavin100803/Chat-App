@@ -1,10 +1,7 @@
 import 'package:chatapp/colors.dart';
-import 'package:chatapp/models/UserModel.dart';
-import 'package:chatapp/pages/complateprofile.dart';
 import 'package:chatapp/pages/loginpage.dart';
 import 'package:chatapp/pages/myphone.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 
@@ -18,7 +15,9 @@ class MyOtp extends StatefulWidget {
 
 class _MyOtpState extends State<MyOtp> {
   TextEditingController otpController = TextEditingController();
+
   final FirebaseAuth auth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
     final defaultPinTheme = PinTheme(

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:chatapp/colors.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:path/path.dart' as p;
