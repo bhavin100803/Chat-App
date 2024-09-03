@@ -22,7 +22,7 @@ class UserModel {
   UserModel.fromMap2() {
     uid = "123456789";
     fullname = "Robot";
-    email = "Jaydiptank@gmail.com";
+    email = "Jaydip@gmail.com";
     profilepic = "profilepic";
   }
 

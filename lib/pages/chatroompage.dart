@@ -330,6 +330,45 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         .doc(message.messageid)
         .delete();
   }
+  // void deleteMessageForUser1() {
+  //   var firestore = FirebaseFirestore.instance
+  //       .collection("chatrooms")
+  //       .doc(widget.chatroom.chatroomid);
+  //   firestore.collection('messages').getDocuments().then((snapshot) {
+  //     for (DocumentSnapshot ds in snapshot.docs){
+  //       ds.reference.delete();
+  //     };
+  //   });
+  //   FirebaseFirestore.instance
+  //       .collection("chatrooms")
+  //       .doc(widget.chatroom.chatroomid)
+  //       // .collection("messages")
+  //       .delete();
+  // }
+
+  Future<void> deleteCollection() async {
+    final collectionRef = FirebaseFirestore.instance
+        .collection("chatrooms")
+        .doc(widget.chatroom.chatroomid)
+        .collection("messages");
+    final batch = FirebaseFirestore.instance.batch();
+
+    try {
+      // Get all documents in the collection
+      final querySnapshot = await collectionRef.get();
+
+      // Loop through and delete each document
+      for (var document in querySnapshot.docs) {
+        batch.delete(document.reference);
+      }
+
+      // Commit the batch
+      await batch.commit();
+      print("Collection deleted successfully");
+    } catch (e) {
+      print("Error deleting collection:$e");
+    }
+  }
 
   void deleteMessageForAll(MessageModel message) {
     FirebaseFirestore.instance
@@ -530,6 +569,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                               Navigator.pop(context);
                                               // Handle reply
                                               // replyToMessage(currentMessage);
+                                              // deleteMessageForUser1();
+                                              deleteCollection();
                                             },
                                           ),
                                           ListTile(
